@@ -1,0 +1,26 @@
+{
+  "name": "learn-graphql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"nodemon -e js,json,graphql"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kai815/learn-graphql.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kai815/learn-graphql/issues"
+  },
+  "homepage": "https://github.com/kai815/learn-graphql#readme",
+  "dependencies": {
+    "apollo-server": "^3.11.1",
+    "graphql": "^16.6.0",
+    "nodemon": "^2.0.20"
+  }
+}
