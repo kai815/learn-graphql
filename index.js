@@ -1,26 +1,40 @@
 const { ApolloServer } = require(`apollo-server`)
 
 const typeDefs = `
+  type Photo {
+    id: ID!
+    url: String!
+    name: String!
+    description: String
+  }
   type Query {
     totalPhotos: Int!
+    allPhotos: [Photo!]!
   }
   type Mutation {
-    postPhoto(name: String! description: String): Boolean!
+    postPhoto(name: String! description: String): Photo!
   }
 `
 
-// 写真を格納するための配列を定義する
+// 1. ユニークIDをインクリメントするための変数
+var _id = 0
 var photos = []
 
 const resolvers = {
   Query: {
-    totalPhotos: () => photos.length
+    totalPhotos: () => photos.length,
+    allPhotos: () => photos
   },
   // postPhotoミューテーションと対応するリゾルバ
   Mutation: {
     postPhoto(parent, args) {
-        photos.push(args)
-        return true
+      // 2.新しい写真を作成し、idを生成する
+      var newPhoto = {
+        id: _id++,
+        ...args
+      }
+      photos.push(newPhoto)
+      return newPhoto
     }
   }
 }
