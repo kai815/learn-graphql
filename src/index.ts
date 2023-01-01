@@ -91,6 +91,7 @@ const resolvers = {
   },
   // postPhotoミューテーションと対応するリゾルバ
   Mutation: {
+    // @ts-ignore
     postPhoto(parent, args) {
       // 2.新しい写真を作成し、idを生成する
       const newPhoto = {
@@ -103,10 +104,13 @@ const resolvers = {
     }
   },
   Photo: {
+    // @ts-ignore
     url: parent => `http://yoursite.com/img/${parent.id}.jpg`,
+    // @ts-ignore
     postedBy: parent => {
       return users.find(u => u.githubLogin === parent.githubUser)
     },
+    // @ts-ignore
     taggedUsers: parent => tags.filter(
       tag => tag.photoID === parent.id
     ).map(
@@ -116,9 +120,11 @@ const resolvers = {
       )
   },
   User: {
+    // @ts-ignore
     postedPhotos: parent => {
       return photos.filter(p => p.githubUser === parent.githubLogin)
     },
+    // @ts-ignore
     inPhotos: parent => tags.filter(
       tag => tag.userID === parent.id
     ).map(
@@ -132,8 +138,11 @@ const resolvers = {
   DateTime:new GraphQLScalarType({
     name:'DateTime',
     description:'A Valid Date Time Value',
+    // @ts-ignore
     parseValue:value => new Date(value),
+    // @ts-ignore
     server:value => new Date(value).toISOString(),
+    // @ts-ignore
     parseLiteral: ast => ast.value
   })
 }
@@ -148,4 +157,5 @@ const server = new ApolloServer({
 // Webサーバーを起動
 server
   .listen()
+  // @ts-ignore
   .then(({url}) => console.log(`GraphQL Service running on ${url}`))
