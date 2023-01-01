@@ -1,4 +1,5 @@
 const { ApolloServer } = require(`apollo-server`)
+const { GraphQLScalarType } = require(`graphql`)
 
 const typeDefs = `
   enum PhotoCategory {
@@ -15,6 +16,7 @@ const typeDefs = `
   postedPhotos: [Photo!]!
   inPhotos: [Photo!]!
   }
+  scalar DateTime
   type Photo {
     id: ID!
     url: String!
@@ -23,10 +25,11 @@ const typeDefs = `
     category: PhotoCategory!
     postedBy: User!
     taggedUsers: [User!]!
+    created: DateTime!
   }
   type Query {
     totalPhotos: Int!
-    allPhotos: [Photo!]!
+    allPhotos(after:DateTime): [Photo!]!
   }
   input PostPhotoInput {
     name: String!
@@ -54,20 +57,23 @@ let photos = [
     "name": "Dropping the Heart Chute",
     "description": "The heart chute is one of my favorite chutes",
     "category": "ACTION",
-    "githubUser": "gPlake"
+    "githubUser": "gPlake",
+    "created": "3-28-1977"
   },
   {
     "id": "2",
     "name": "Enjoying the sunshine",
     "category": "SELFIE",
-    "githubUser": "sSchmidt"
+    "githubUser": "sSchmidt",
+    "created": "1-2-1985"
   },
   {
     "id": "3",
     "name": "Gunbarrel 25",
     "description": "25 laps on gunbarrel today",
     "category": "LANDSCAPE",
-    "githubUser": "sSchmidt"
+    "githubUser": "sSchmidt",
+    "created": "2018-04-15T19:09:57.308Z"
   }
 ]
 
@@ -89,7 +95,8 @@ const resolvers = {
       // 2.新しい写真を作成し、idを生成する
       const newPhoto = {
         id: _id++,
-        ...args.input
+        ...args.input,
+        created: new Date()
       }
       photos.push(newPhoto)
       return newPhoto
@@ -121,7 +128,14 @@ const resolvers = {
         photo => photo.id === photoId
       )
     )
-  }
+  },
+  DateTime:new GraphQLScalarType({
+    name:'DateTime',
+    description:'A Valid Date Time Value',
+    parseValue:value => new Date(value),
+    server:value => new Date(value).toISOString(),
+    parseLiteral: ast => ast.value
+  })
 }
 
 // サーバーのインスタンスを作成
