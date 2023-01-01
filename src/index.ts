@@ -91,6 +91,7 @@ const resolvers = {
   },
   // postPhotoミューテーションと対応するリゾルバ
   Mutation: {
+    //TODOこの辺のやつはts-ignoreは後で直す
     // @ts-ignore
     postPhoto(parent, args) {
       // 2.新しい写真を作成し、idを生成する
