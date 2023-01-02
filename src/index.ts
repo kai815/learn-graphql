@@ -1,5 +1,6 @@
-const { ApolloServer } = require(`apollo-server`)
-const { GraphQLScalarType } = require(`graphql`)
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { GraphQLScalarType } from 'graphql';
 
 const typeDefs = `
   enum PhotoCategory {
@@ -156,7 +157,7 @@ const server = new ApolloServer({
 })
 
 // Webサーバーを起動
-server
-  .listen()
-  // @ts-ignore
-  .then(({url}) => console.log(`GraphQL Service running on ${url}`))
+const { url } = await startStandaloneServer(server, {
+  listen: { port: 4000 },
+});
+console.log(`GraphQL Service running on ${url}`)
