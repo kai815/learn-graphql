@@ -47,13 +47,12 @@ export const resolvers = {
   Query: {
     // @ts-ignore
     totalPhotos: (parent, args, contextValue) => {
-      //TODO collectionの中身の変更
-      const count = contextValue.db.collection('learn_graphql').estimatedDocumentCount()
+      const count = contextValue.db.collection('photos').estimatedDocumentCount()
       return count
     },
     // @ts-ignore
     allPhotos: (parent, args, contextValue) => {
-      const photos = contextValue.db.collection('learn_graphql').find().toArray()
+      const photos = contextValue.db.collection('photos').find().toArray()
       return photos
     },
     // @ts-ignore
