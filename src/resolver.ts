@@ -56,6 +56,16 @@ export const resolvers = {
       const photos = contextValue.db.collection('learn_graphql').find().toArray()
       return photos
     },
+    // @ts-ignore
+    totalUsers: (parent, args, contextValue) => {
+      const count = contextValue.db.collection('users').estimatedDocumentCount()
+      return count
+    },
+    // @ts-ignore
+    allUsers: (parent, args, contextValue) => {
+      const users = contextValue.db.collection('users').find().toArray()
+      return users
+    },
   },
   // postPhotoミューテーションと対応するリゾルバ
   Mutation: {
