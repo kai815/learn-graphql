@@ -45,14 +45,32 @@ let tags = [
 
 export const resolvers = {
   Query: {
-    totalPhotos: () => photos.length,
-    allPhotos: () => photos
+    // @ts-ignore
+    totalPhotos: (parent, args, contextValue) => {
+      const count = contextValue.db.collection('photos').estimatedDocumentCount()
+      return count
+    },
+    // @ts-ignore
+    allPhotos: (parent, args, contextValue) => {
+      const photos = contextValue.db.collection('photos').find().toArray()
+      return photos
+    },
+    // @ts-ignore
+    totalUsers: (parent, args, contextValue) => {
+      const count = contextValue.db.collection('users').estimatedDocumentCount()
+      return count
+    },
+    // @ts-ignore
+    allUsers: (parent, args, contextValue) => {
+      const users = contextValue.db.collection('users').find().toArray()
+      return users
+    },
   },
   // postPhotoミューテーションと対応するリゾルバ
   Mutation: {
     //TODOこの辺のやつはts-ignoreは後で直す
     // @ts-ignore
-    postPhoto(parent, args) {
+    postPhoto(parent, args, contextValue) {
       // 2.新しい写真を作成し、idを生成する
       const newPhoto = {
         id: _id++,

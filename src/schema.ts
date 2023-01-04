@@ -28,6 +28,8 @@ export const typeDefs = `
   type Query {
     totalPhotos: Int!
     allPhotos(after:DateTime): [Photo!]!
+    totalUsers: Int!
+    allUsers: [User!]!
   }
   input PostPhotoInput {
     name: String!
