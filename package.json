@@ -24,7 +24,8 @@
     "@apollo/server": "^4.3.0",
     "dotenv": "^16.0.3",
     "graphql": "^16.6.0",
-    "mongodb": "4.13"
+    "mongodb": "4.13",
+    "node-fetch": "^3.3.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

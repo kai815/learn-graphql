@@ -1,4 +1,5 @@
 import { GraphQLScalarType } from 'graphql';
+import fetch from 'node-fetch';
 
 // 1. ユニークIDをインクリメントするための変数
 let _id = 0
@@ -43,6 +44,39 @@ let tags = [
   { "photoID": "2", "userID": "gPlake" }
 ]
 
+const requestGithubToken = async (credentials:string) => {
+  const response = await fetch(`https://github.com/login/oauth/access_token`, {
+      method: 'post',
+      body: JSON.stringify(credentials),
+      headers: {
+        'Content-Type': 'application/json',
+        Accept:'application/json'
+      }
+  })
+  return await response.json()
+}
+
+const requestGithubUserAccount = async (token:any) =>{
+  const response = await fetch(`https://api.github.com/user`,{
+    headers:{
+      "Authorization":`token ${token}`
+    }
+  })
+  return await response.json()
+}
+
+const authorizeWithGithub = async (credentials:any) => {
+  // @ts-ignore
+  const { access_token } = await requestGithubToken(credentials)
+  if(access_token){
+    const githubUser = await requestGithubUserAccount(access_token)
+    console.log({githubUser})
+    // @ts-ignore
+    return { ...githubUser, access_token }
+  }
+  return {"message":"notuser"}
+}
+
 export const resolvers = {
   Query: {
     // @ts-ignore
@@ -79,7 +113,38 @@ export const resolvers = {
       }
       photos.push(newPhoto)
       return newPhoto
-    }
+    },
+    // @ts-ignore
+    async githubAuth(parent, args, contextValue) {
+      const {
+        message,
+        access_token,
+        avatar_url,
+        login,
+        name
+      } = await authorizeWithGithub({
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        code:args.code
+      })
+
+      if (message) {
+        throw new Error(message)
+      }
+
+      const latestUserInfo = {
+        name,
+        githubLogin: login,
+        githubToken: access_token,
+        avatar: avatar_url
+      }
+
+      const { ops:[user] } = await contextValue.db
+        .collection('users')
+        .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true })
+
+      return { user, token: access_token }
+    },
   },
   Photo: {
     // @ts-ignore

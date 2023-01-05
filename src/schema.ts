@@ -14,6 +14,10 @@ export const typeDefs = `
   postedPhotos: [Photo!]!
   inPhotos: [Photo!]!
   }
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
   scalar DateTime
   type Photo {
     id: ID!
@@ -38,5 +42,6 @@ export const typeDefs = `
   }
   type Mutation {
     postPhoto(input:PostPhotoInput!): Photo!
+    githubAuth(code: String!): AuthPayload!
   }
 `
