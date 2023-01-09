@@ -108,14 +108,20 @@ export const resolvers = {
   Mutation: {
     //TODOこの辺のやつはts-ignoreは後で直す
     // @ts-ignore
-    postPhoto(parent, args, contextValue) {
-      // 2.新しい写真を作成し、idを生成する
+    async postPhoto(parent, args, contextValue) {
+      const { currentUser, db } = contextValue
+      // ユーザーがいなければエラー
+      if(!currentUser){
+      throw new Error(`only an authorized user can post a photo`)
+      }
       const newPhoto = {
-        id: _id++,
         ...args.input,
+        userID:currentUser.githubLogin,
         created: new Date()
       }
-      photos.push(newPhoto)
+      // 3. 新しいphotoを追加して、データベースが生成したIDを取得する
+      const { insertedIds } = await db.collection(`photos`).insert(newPhoto)
+      newPhoto.id = insertedIds[0]
       return newPhoto
     },
     // @ts-ignore
@@ -145,10 +151,12 @@ export const resolvers = {
   },
   Photo: {
     // @ts-ignore
-    url: parent => `http://yoursite.com/img/${parent.id}.jpg`,
+    id: parent => parent.id || parent._id,
     // @ts-ignore
-    postedBy: parent => {
-      return users.find(u => u.githubLogin === parent.githubUser)
+    url: parent => `http://yoursite.com/img/${parent._id}.jpg`,
+    // @ts-ignore
+    postedBy: (parent,args,{db}) => {
+      return db.collection(`users`).findOne({ githubLogin: parent.userID })
     },
     // @ts-ignore
     taggedUsers: parent => tags.filter(
