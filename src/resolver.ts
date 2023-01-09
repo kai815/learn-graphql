@@ -68,6 +68,7 @@ const requestGithubUserAccount = async (token:any) =>{
 const authorizeWithGithub = async (credentials:any) => {
   // @ts-ignore
   const { access_token } = await requestGithubToken(credentials)
+  console.log({access_token})
   if(access_token){
     const githubUser = await requestGithubUserAccount(access_token)
     console.log({githubUser})
@@ -116,34 +117,27 @@ export const resolvers = {
     },
     // @ts-ignore
     async githubAuth(parent, args, contextValue) {
-      const {
-        message,
-        access_token,
-        avatar_url,
-        login,
-        name
-      } = await authorizeWithGithub({
+      const githubUser = await authorizeWithGithub({
         client_id: process.env.CLIENT_ID,
         client_secret: process.env.CLIENT_SECRET,
         code:args.code
       })
 
-      if (message) {
-        throw new Error(message)
+      if (githubUser.message) {
+        throw new Error(githubUser.message)
       }
 
       const latestUserInfo = {
-        name,
-        githubLogin: login,
-        githubToken: access_token,
-        avatar: avatar_url
+        name:githubUser.name,
+        githubLogin: githubUser.login,
+        githubToken: githubUser.access_token,
+        avatar: githubUser.avatar_url
       }
 
-      const { ops:[user] } = await contextValue.db
+      const dbres = await contextValue.db
         .collection('users')
-        .replaceOne({ githubLogin: login }, latestUserInfo, { upsert: true })
-
-      return { user, token: access_token }
+        .replaceOne({ githubLogin: githubUser.login }, latestUserInfo, { upsert: true })
+      return { user:latestUserInfo,token: githubUser.access_token }
     },
   },
   Photo: {
