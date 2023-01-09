@@ -30,6 +30,7 @@ export const typeDefs = `
     created: DateTime!
   }
   type Query {
+    me: User
     totalPhotos: Int!
     allPhotos(after:DateTime): [Photo!]!
     totalUsers: Int!

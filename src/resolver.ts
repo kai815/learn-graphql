@@ -81,6 +81,9 @@ const authorizeWithGithub = async (credentials:any) => {
 export const resolvers = {
   Query: {
     // @ts-ignore
+    me:(parent, args, contextValue) => contextValue.currentUser
+    ,
+    // @ts-ignore
     totalPhotos: (parent, args, contextValue) => {
       const count = contextValue.db.collection('photos').estimatedDocumentCount()
       return count
