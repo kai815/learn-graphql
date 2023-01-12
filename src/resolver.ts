@@ -161,6 +161,18 @@ export const resolvers = {
       }))
       await db.collection(`users`).insert(users)
       return users
+    },
+    // @ts-ignore
+    fakeUserAuth: async (parent, { githubLogin }, { db }) => {
+      const user = await db.collection(`users`).findOne({ githubLogin })
+      if (!user) {
+        // @ts-ignore
+        throw new Error(`Cannot find user with githubLogin ${githubLogin}`)
+      }
+      return {
+        token: user.githubToken,
+        user
+      }
     }
   },
   Photo: {
