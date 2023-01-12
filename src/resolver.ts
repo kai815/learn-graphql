@@ -148,6 +148,20 @@ export const resolvers = {
         .replaceOne({ githubLogin: githubUser.login }, latestUserInfo, { upsert: true })
       return { user:latestUserInfo,token: githubUser.access_token }
     },
+    // @ts-ignore
+    addFakeUsers: async (root, {count}, {db}) => {
+      const randomUserApi = `https://randomuser.me/api/?results=${count}`
+      const { results } = await fetch(randomUserApi).then(res => res.json())
+      // @ts-ignore
+      const users = results.map((r) => ({
+        githubLogin: r.login.username,
+        name: `${r.name.first} ${r.name.last}`,
+        avatar: r.picture.thumbnail,
+        githubToken: r.login.sha1
+      }))
+      await db.collection(`users`).insert(users)
+      return users
+    }
   },
   Photo: {
     // @ts-ignore
