@@ -14,6 +14,10 @@ export const typeDefs = `
   postedPhotos: [Photo!]!
   inPhotos: [Photo!]!
   }
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
   scalar DateTime
   type Photo {
     id: ID!
@@ -26,6 +30,7 @@ export const typeDefs = `
     created: DateTime!
   }
   type Query {
+    me: User
     totalPhotos: Int!
     allPhotos(after:DateTime): [Photo!]!
     totalUsers: Int!
@@ -38,5 +43,8 @@ export const typeDefs = `
   }
   type Mutation {
     postPhoto(input:PostPhotoInput!): Photo!
+    githubAuth(code: String!): AuthPayload!
+    addFakeUsers(count: Int = 1): [User!]!
+    fakeUserAuth(githubLogin: ID!): AuthPayload!
   }
 `

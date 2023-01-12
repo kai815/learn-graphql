@@ -21,8 +21,11 @@ const server = new ApolloServer({
 // Webサーバーを起動
 const { url } = await startStandaloneServer(server, {
   listen: { port: 4000 },
-  context: async () => ({
-    db: await client.db('learn_graphql')
-  })
+  context: async ({req}) => {
+    const db = await client.db('learn_graphql')
+    const githubToken = req.headers.authorization
+    const currentUser = await db.collection(`users`).findOne({ githubToken })
+    return {db, currentUser}
+  }
 });
 console.log(`GraphQL Service running on ${url}`)
