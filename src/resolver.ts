@@ -89,8 +89,9 @@ export const resolvers = {
       return count
     },
     // @ts-ignore
-    allPhotos: (parent, args, contextValue) => {
-      const photos = contextValue.db.collection('photos').find().toArray()
+    allPhotos: async (parent, args, contextValue) => {
+      const photos = await contextValue.db.collection('photos').find().toArray()
+      // const result = photos.filter((photo:any) => photo.created > args.after)
       return photos
     },
     // @ts-ignore
@@ -182,6 +183,7 @@ export const resolvers = {
     url: parent => `http://yoursite.com/img/${parent._id}.jpg`,
     // @ts-ignore
     postedBy: (parent,args,{db}) => {
+      console.log({parent})
       return db.collection(`users`).findOne({ githubLogin: parent.userID })
     },
     // @ts-ignore
@@ -194,6 +196,11 @@ export const resolvers = {
     )
   },
   User: {
+    // @ts-ignore
+    name: parent => {
+      console.log("user.name",{parent})
+      return `${parent.githubLogin} ${parent.name ?? 'kaizuka'}`
+    },
     // @ts-ignore
     postedPhotos: parent => {
       return photos.filter(p => p.githubUser === parent.githubLogin)
